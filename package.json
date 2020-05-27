@@ -1,0 +1,32 @@
+{
+  "name": "managed-timeout",
+  "version": "1.0.0",
+  "description": "setTimeout class wrapper with abilities to pause/resume, finish preemptively, and inspection",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/religiosa1/managed-timeout.git"
+  },
+  "types": "dist/timeout.d.ts",
+  "main": "dist/timeout.js",
+  "scripts": {
+    "build": "tsc -p .",
+    "test": "npx jest"
+  },
+  "keywords": [
+    "timer",
+    "timeout",
+    "setTimeout",
+    "delay",
+    "wait",
+    "pause",
+    "resume",
+    "cancel",
+    "typescript"
+  ],
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^26.0.1",
+    "mockdate": "^3.0.2",
+    "typescript": "^3.9.3"
+  }
+}
