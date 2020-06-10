@@ -1,5 +1,5 @@
 const MockDate = require('mockdate');
-const { Timeout } = require("../dist/timeout.js");
+const { Timeout, repeatedStart } = require("../dist/timeout.js");
 const delay = 1000;
 
 beforeEach(() => {
@@ -27,6 +27,7 @@ test("simple timeout execution", () => {
   let callback = jest.fn();
   let timer = new Timer();
   to = new Timeout(callback, delay);
+  expect(to.isStarted).toBe(true);
   expect(callback).not.toBeCalled();
   timer.advance(delay);
   expect(callback).toBeCalled();
@@ -157,7 +158,6 @@ test("reset can change delay", () => {
 });
 
 test("reset unpauses timeout", () => {
-  const newDelay = 800;
   let callback = jest.fn();
   let timer = new Timer();
   let to = new Timeout(callback, delay);
@@ -243,4 +243,87 @@ test("pause does nothing on paused timeout", () => {
   expect(st).toBe(false);
   expect(to.paused).toBe(true);
   expect(to.isPending).toBe(true);
+});
+
+test("basic delayed execution", ()=>{
+  let timer = new Timer();
+  let callback = jest.fn();
+  let to = new Timeout(delay);
+  timer.advance(delay);
+  expect(to.isPending).toBe(false);
+  expect(to.isStarted).toBe(false);
+  to.start(callback);
+  expect(to.isPending).toBe(true);
+  expect(to.isStarted).toBe(true);
+  expect(to.isFinished).toBe(false);
+  expect(callback).not.toBeCalled();
+  timer.advance(delay);
+  expect(to.isPending).toBe(false);
+  expect(to.isStarted).toBe(true);
+  expect(to.isFinished).toBe(true);
+  expect(callback).toBeCalled();
+});
+
+test("delayed execution bad callback", ()=>{
+  expect(() => {
+    new Timeout(delay).start("bad");
+  }).toThrow()
+});
+
+test("reset on a non-started timeout", ()=>{
+  let timer = new Timer();
+  let to = new Timeout(delay);
+  let callback = jest.fn();
+  expect(to.delay).toBe(delay);
+  to.reset(delay*2);
+  expect(to.delay).toBe(delay*2);
+  expect(to.isStarted).toBe(false);
+  expect(to.isPending).toBe(false);
+  to.start(callback);
+  timer.advance(delay);
+  expect(callback).not.toBeCalled();
+  timer.advance(delay);
+  expect(callback).toBeCalled();
+});
+
+test("promise style start", () =>{
+  let timer = new Timer();
+  let to = new Timeout(delay);
+  let p = to.start();
+  expect(p).toBeInstanceOf(Promise);
+  expect(to.isPending).toBe(true);
+  expect(to.isStarted).toBe(true);
+  expect(to.isFinished).toBe(false);
+  timer.advance(delay);
+  return p.then(()=>{
+    expect(to.isPending).toBe(false);
+    expect(to.isStarted).toBe(true);
+    expect(to.isFinished).toBe(true);
+    expect(timer.diff()).toBeGreaterThanOrEqual(delay);
+  });
+});
+
+test("promise style pause", () =>{
+  let timer = new Timer();
+  let to = new Timeout(delay);
+  let p = to.start();
+  to.pause();
+  timer.advance(delay);
+  to.resume();
+  timer.advance(delay);
+  return p.then(()=>{
+    expect(timer.diff()).toBeGreaterThanOrEqual(delay*2);
+  });
+});
+
+test("promise rejection on repeated start calls without args", ()=>{
+  let to = new Timeout(delay);
+  to.start();
+  return expect(to.start()).rejects.toBe(repeatedStart);
+});
+
+test("false on repeated start calls with args", ()=>{
+  let to = new Timeout(delay);
+  to.start();
+  expect(to.start(()=>{})).toBe(false);
 });

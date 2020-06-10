@@ -1,3 +1,6 @@
+export declare const callbackError = "Expeting to get a cb function as the first argument";
+export declare const delayError = "Delay argument should be a number >= 0";
+export declare const repeatedStart = "Timeout was already started";
 export declare class Timeout {
     private _pending;
     private _canceled;
@@ -7,14 +10,16 @@ export declare class Timeout {
     private _to;
     private _startTime;
     private _cb;
-    /** schedueles timeout
-     * @param {(...args: any[])=>void} cb callback to execute after delay time has passed
-     * @param {number} delay delay time in millieseconds
-     * @throws {Error} if cb isn't a function or delay isn't a number or less than zero.
+    /** Timeout constructor, schedueles timeout is callback is provided.
+     * @param {(...args: any[])=>void } cb_or_delay callback to execute after delay time has passed, or delay time in millieseconds
+     * @param {number} delay delay time in millieseconds (if cb function is supplied)
+     * @throws {Error} if cb isn't a function or a number or if delay isn't a number or less than zero.
      */
-    constructor(cb: (...args: any[]) => void, delay: number);
+    constructor(cb_or_delay: ((...args: any[]) => void) | number, delay?: number);
     /** True if timeout is pending for execution (actively running or paused) */
     get isPending(): boolean;
+    /** True if timeout was started */
+    get isStarted(): boolean;
     /** True if timeout was canceled */
     get isCanceled(): boolean;
     /** True if timeout was finished (normally or preemptively) */
@@ -27,6 +32,8 @@ export declare class Timeout {
     get timePassed(): number;
     private _run;
     private _halt;
+    /** Starts a timeout created without a callback */
+    start(cb?: (...args: any[]) => void): boolean | Promise<void>;
     /** Cancels the timeout completely.
      * @returns {boolean} true if the timeout was stopped, false if it wasn't pending to begin with
      */
@@ -50,9 +57,10 @@ export declare class Timeout {
     get paused(): boolean;
     set paused(val: boolean);
     /**
-     * Reset the timeout's timer with the previous delay value or a new delay.
+     * Reset the timeout's delay with the previous delay value or a new one.
      * The timeout will be unpaused and running if it's in the paused state.
      * If the timeout was finished or canceled do nothing, return false.
+     * If timeout wasn't started just changes the delay time.
      * @param {number} [delay] delay time to which reset the timeout (default the same as before)
      * @throws {Error} if delay was supplied and it isn't a number >= 0
      * @return {boolean} status if timeout was reset or not.
