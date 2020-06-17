@@ -17,7 +17,7 @@ Typescript module and es5 compiled common js inside. Fully tested.
 
 ```js
 import { Timeout } from "managed-timeout";
-// or const Timeout = require("managed-timeout");
+// or const { Timeout } = require("managed-timeout");
 
 let to = new Timeout(()=>console.log("Hello World"), 15000);
 to.pause();

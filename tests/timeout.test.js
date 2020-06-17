@@ -170,7 +170,7 @@ test("reset unpauses timeout", () => {
   expect(callback).toBeCalled();
 });
 
-test("timeLeft", () => {
+test("timeLeft contains correct value", () => {
   const ldelay = delay * 0.57;
   const etl = delay - ldelay;
 
@@ -183,7 +183,7 @@ test("timeLeft", () => {
   expect(tl).toBeCloseTo(etl);
 });
 
-test("timePassed", () => {
+test("timePassed contains correct value", () => {
   const ldelay = delay * 0.57;
 
   let timer = new Timer();
@@ -270,13 +270,14 @@ test("delayed execution bad callback", ()=>{
   }).toThrow()
 });
 
-test("reset on a non-started timeout", ()=>{
+test("reset on a non-started timeout only changes delay and timeLeft", ()=>{
   let timer = new Timer();
   let to = new Timeout(delay);
   let callback = jest.fn();
   expect(to.delay).toBe(delay);
   to.reset(delay*2);
   expect(to.delay).toBe(delay*2);
+  expect(to.timeLeft).toBe(delay*2);
   expect(to.isStarted).toBe(false);
   expect(to.isPending).toBe(false);
   to.start(callback);
@@ -322,7 +323,7 @@ test("promise rejection on repeated start calls without args", ()=>{
   return expect(to.start()).rejects.toBe(repeatedStart);
 });
 
-test("false on repeated start calls with args", ()=>{
+test("returns false on repeated start calls with args", ()=>{
   let to = new Timeout(delay);
   to.start();
   expect(to.start(()=>{})).toBe(false);
