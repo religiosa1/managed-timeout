@@ -10,12 +10,18 @@ export declare class Timeout {
     private _to;
     private _startTime;
     private _cb;
+    /** Timeout constructor, without scheduling a callback.
+      * Callback must be provided later with the start function.
+      * @param {number} delay delay time in millieseconds
+      * @throws {Error} if cb isn't a function or a number or if delay isn't a number or less than zero.
+      */
+    constructor(delay: number);
     /** Timeout constructor, schedueles timeout is callback is provided.
-     * @param {(...args: any[])=>void } cb_or_delay callback to execute after delay time has passed, or delay time in millieseconds
-     * @param {number} delay delay time in millieseconds (if cb function is supplied)
+     * @param {(...args: any[])=>void } cb callback to execute after delay time has passed, or delay time in millieseconds
+     * @param {number} delay delay time in millieseconds
      * @throws {Error} if cb isn't a function or a number or if delay isn't a number or less than zero.
      */
-    constructor(cb_or_delay: ((...args: any[]) => void) | number, delay?: number);
+    constructor(cb: ((...args: any[]) => void), delay: number);
     /** True if timeout is pending for execution (actively running or paused) */
     get isPending(): boolean;
     /** True if timeout was started */
@@ -32,8 +38,15 @@ export declare class Timeout {
     get timePassed(): number;
     private _run;
     private _halt;
-    /** Starts a timeout created without a callback */
-    start(cb?: (...args: any[]) => void): boolean | Promise<void>;
+    /** Starts a timeout created without a callback.
+     * @returns a Promise, resolving after the delay time has passed.
+     */
+    start(): Promise<void>;
+    /** Starts a timeout created without a callback.
+     * @param cb callback to be called after the delay time has passed.
+     * @returns true if callback was successfully started, false otherwise.
+     */
+    start(cb: (...args: any[]) => void): boolean;
     /** Cancels the timeout completely.
      * @returns {boolean} true if the timeout was stopped, false if it wasn't pending to begin with
      */

@@ -13,11 +13,18 @@ export class Timeout {
   private _startTime: number; //< latest setTimeout call time as returned by Date.getTime()
   private _cb: (...args: any[])=>void; //< timeout callback
 
-  /** Timeout constructor, schedueles timeout is callback is provided.
-   * @param {(...args: any[])=>void } cb_or_delay callback to execute after delay time has passed, or delay time in millieseconds
-   * @param {number} delay delay time in millieseconds (if cb function is supplied)
+ /** Timeout constructor, without scheduling a callback.
+   * Callback must be provided later with the start function.
+   * @param {number} delay delay time in millieseconds
    * @throws {Error} if cb isn't a function or a number or if delay isn't a number or less than zero.
    */
+  constructor(delay: number);
+  /** Timeout constructor, schedueles timeout is callback is provided.
+   * @param {(...args: any[])=>void } cb callback to execute after delay time has passed, or delay time in millieseconds
+   * @param {number} delay delay time in millieseconds
+   * @throws {Error} if cb isn't a function or a number or if delay isn't a number or less than zero.
+   */
+  constructor(cb: ((...args: any[])=>void), delay: number);
   constructor(cb_or_delay: ((...args: any[])=>void) | number , delay?: number) {
     const d = (typeof cb_or_delay === "number") ? cb_or_delay : delay;
     if (typeof d !== "number" || d < 0) {
@@ -84,7 +91,15 @@ export class Timeout {
     this._timeLeft = this.timeLeft;
   }
 
-  /** Starts a timeout created without a callback */
+  /** Starts a timeout created without a callback.
+   * @returns a Promise, resolving after the delay time has passed.
+   */
+  start(): Promise<void>;
+  /** Starts a timeout created without a callback.
+   * @param cb callback to be called after the delay time has passed.
+   * @returns true if callback was successfully started, false otherwise.
+   */
+  start(cb: (...args: any[])=>void): boolean;
   start(cb?: (...args: any[])=>void): boolean | Promise<void> {
     if (cb != null) {
       if (typeof cb !== "function") { throw new Error(callbackError); }

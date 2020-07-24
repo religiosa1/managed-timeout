@@ -85,7 +85,10 @@ Throws if delay isn't a number or is less than zero
 
 ### Methods
 
-**`start(cb?: ()=>void): boolean|Promise<void>`**
+**`start(): Promise<void>`**
+
+**`start(cb: ()=>void): boolean`**
+
 Arms a timeout created without a callback. If the method was called without
 a callback, then returns a promise, which will be resolved once the delay time
 is passed (timeout can be paused or resumed as usual).

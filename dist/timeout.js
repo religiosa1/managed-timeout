@@ -5,11 +5,6 @@ exports.callbackError = "Expeting to get a cb function as the first argument";
 exports.delayError = "Delay argument should be a number >= 0";
 exports.repeatedStart = "Timeout was already started";
 var Timeout = /** @class */ (function () {
-    /** Timeout constructor, schedueles timeout is callback is provided.
-     * @param {(...args: any[])=>void } cb_or_delay callback to execute after delay time has passed, or delay time in millieseconds
-     * @param {number} delay delay time in millieseconds (if cb function is supplied)
-     * @throws {Error} if cb isn't a function or a number or if delay isn't a number or less than zero.
-     */
     function Timeout(cb_or_delay, delay) {
         this._pending = false;
         this._canceled = false;
@@ -105,7 +100,6 @@ var Timeout = /** @class */ (function () {
         }
         this._timeLeft = this.timeLeft;
     };
-    /** Starts a timeout created without a callback */
     Timeout.prototype.start = function (cb) {
         var _this = this;
         if (cb != null) {
