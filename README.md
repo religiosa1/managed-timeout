@@ -7,7 +7,7 @@ A setTimeout with extended functionality. Provides the ability to:
 - inspect on whether a timeout is still pending, was canceled or finished normally
 - optional promise support
 
-Typescript module and es5 compiled common js inside. Fully tested.
+Typescript support. Fully tested.
 
 ## Usage
 
