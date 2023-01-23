@@ -9,10 +9,11 @@ A setTimeout with extended functionality. Provides the ability to:
 
 Typescript support. Fully tested.
 
-## Usage
+## Installation
 
 `npm install --save managed-timeout`
 
+## Usage
 ### Callback-style
 
 ```js
@@ -72,7 +73,7 @@ new Timeout(3000).start().then(()=>{/* ... */}).pause();
 ## API
 
 ### Constructor
-**`new Timeout(cb: ()=>void, delay: number)`**
+**`new Timeout(cb: (to: Timeout)=>void, delay: number)`**
 
 Matches the setTimeout signature. Schedules to call cb function after delay milliseconds.
 Throws if cb isn't a function or delay isn't a number or is less than zero
@@ -85,9 +86,9 @@ Throws if delay isn't a number or is less than zero
 
 ### Methods
 
-**`start(): Promise<void>`**
+**`start(): Promise<Timeout>`**
 
-**`start(cb: ()=>void): boolean`**
+**`start(cb: (to: Timeout)=>void): boolean`**
 
 Arms a timeout created without a callback. If the method was called without
 a callback, then returns a promise, which will be resolved once the delay time
@@ -131,7 +132,12 @@ Returns true if the timeout was reset, false if it had been finished or canceled
 
 All properties are read-only unless stated otherwise.
 
-`paused`
+`state: TimeoutState`
+```ts
+export type TimeoutState = "ready" | "pending" | "paused" | "resolved" | "cancelled";
+```
+
+`paused: boolean`
 
 Status if timeout was paused or not. Writable (the same as calling pause/resume).
 

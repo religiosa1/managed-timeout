@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2022-01-13
+### Added
+- state field
+### Changed
+- all private fields changed to be ECMAScript privates
+- cb now recieves timeout instance as its argument, promise resolves with it too
+- promise rejected value changed to be an error instance instead of a string
+- non-int delay values now throw an error
+### Removed
+- ES5 support was dropped. ES2015 is now the minimum supported target.
+### Security
+- DevDependencies versions bumb
+
 ## [1.1.5] - 2021-11-18
 ### Changed
 - DevDependencies version bump

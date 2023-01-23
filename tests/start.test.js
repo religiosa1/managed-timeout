@@ -19,7 +19,7 @@ describe("delayed start execution", ()=>{
     expect(to.isPending).toBe(false);
     expect(to.isStarted).toBe(true);
     expect(to.isFinished).toBe(true);
-    expect(callback).toBeCalled();
+    expect(callback).toBeCalledWith(to);
   });
 
   test("delayed execution bad callback", ()=>{
@@ -42,7 +42,7 @@ describe("delayed start execution", ()=>{
     timer.advance(delay);
     expect(callback).not.toBeCalled();
     timer.advance(delay);
-    expect(callback).toBeCalled();
+    expect(callback).toBeCalledWith(to);
   });
 
   test("returns false on repeated start calls with args", ()=>{

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "ES2015",
     "module": "UMD",
     "lib": [ "ES5", "ES2015.Promise", "DOM" ],
     "declaration": true,

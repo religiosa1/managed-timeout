@@ -23,7 +23,7 @@ describe("Promisified calls", ()=> {
   it("rejects on repeated calls to strt without args", ()=>{
     let to = new Timeout(delay);
     to.start().catch(()=>{});
-    return expect(() => to.start()).rejects.toBe(repeatedStart);
+    return expect(() => to.start()).rejects.toThrow(repeatedStart);
   });
 
   test("promise style pause", async () =>{
@@ -36,5 +36,13 @@ describe("Promisified calls", ()=> {
     timer.advance(delay);
     await p;
     expect(timer.diff()).toBeGreaterThanOrEqual(delay*2);
+  });
+
+  it("resolves with timeout as its value", async () => {
+    const timer = new Timer();
+    const to = new Timeout(delay);
+    const prms = to.start();
+    timer.advance(delay);
+    await expect(prms).resolves.toBe(to);
   });
 });
