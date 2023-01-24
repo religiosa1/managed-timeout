@@ -45,8 +45,8 @@ If no callback is supplied to the **start** method, it returns a promise.
 It's the only part which isn't pure ES5, make sure to polyfill promises
 if you need to support platforms without them (IE).
 
-Cancellation of a timeout will __not__ result in promise error, promise
-callbacks won't be called at all.
+Currently, cancellation of a timeout will __not__ result in promise error,
+won't be rejected or resolved at all.
 
 Consequtive calls to the start method will result in a promise rejection.
 All the timeout methods should still be called on the timeout instance and not
@@ -66,7 +66,7 @@ to.pause(); // timeout can be paused, continued, cancelled, etc as before
   console.log("called in 5 seconds");
 })();
 
-// BAD DON'T DO THIS -- a call on promise, not on the timeout instance
+// BAD DON'T DO THIS -- a call on promise, not on the Timeout instance
 new Timeout(3000).start().then(()=>{/* ... */}).pause();
 ```
 
@@ -76,7 +76,7 @@ new Timeout(3000).start().then(()=>{/* ... */}).pause();
 **`new Timeout(cb: (to: Timeout)=>void, delay: number)`**
 
 Matches the setTimeout signature. Schedules to call cb function after delay milliseconds.
-Throws if cb isn't a function or delay isn't a number or is less than zero
+Throws if cb isn't a function or delay isn't an integer or is less than zero
 
 **`new Timeout(delay: number)`**
 
@@ -105,8 +105,8 @@ Returns true if the timeout was stopped, false if it wasn't pending to begin wit
 
 Execute pending timeout's callback preemptively, without waiting for the delay
 time and effectively finishing it.
-Returns true if the timeout was finished, false if it was already finished
-or canceled before.
+Returns true if the timeout was finished, false if it has already finished
+or has been canceled before.
 
 **`pause(): boolean`**
 
@@ -125,8 +125,9 @@ The timeout will be unpaused and set running if it was in the paused state.
 If called on non-started timeouts simply changes the delay time, without actually
 starting it. If delay is not supplied, uses the last delay (from the constructor
 or last reset call). Otherwise uses the new supplied delay, potentially throwing
-an error if it's not a number or it is >= 0.
-Returns true if the timeout was reset, false if it had been finished or canceled.
+an error if it's not an integer or it is < 0.
+Returns true if the timeout was reset, false if it has already finished or has
+been canceled.
 
 ### Properties
 
@@ -173,3 +174,10 @@ Time left before the timeout execution. It won't change from call to call when t
 `delay: number`
 
 Currently set total delay time (from the constructor or consecutive calls to reset).
+
+## Contributing
+If you have any ideas or suggestions or want to report a bug, feel free to
+write in the issues section or create a PR.
+
+## License
+managed-timeout is ISC licensed.

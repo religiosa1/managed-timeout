@@ -10,7 +10,8 @@
     "sourceMap": true,
     "outDir": "dist"
   },
-  "files": [
-    "src/timeout.ts"
+  "include": [
+    "./src/timeout.ts",
+    "./tests/**/*"
   ]
 }

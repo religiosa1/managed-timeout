@@ -96,7 +96,7 @@ export class Timeout {
         return false;
       }
       this.#cb = cb;
-      this._run();
+      this.#run();
       return true;
     } else {
       return new Promise((resolve, reject) => {
@@ -104,7 +104,7 @@ export class Timeout {
           return reject(new Error(repeatedStart));
         }
         this.#cb = () => resolve(this);
-        this._run();
+        this.#run();
       });
     }
   }
@@ -114,7 +114,7 @@ export class Timeout {
    */
   cancel(): boolean {
     if (this.#state !== "pending" && this.#state !== "paused") { return false; }
-    this._halt();
+    this.#halt();
     this.#state = "cancelled";
     return true;
   }
@@ -124,10 +124,11 @@ export class Timeout {
    * @returns {boolean} true if the timeout was finished, false if it was already finished or canceled before
    */
   execute(): boolean {
-    if (this.#state !== "pending") { return false; }
-    this._halt();
+    if (this.#state === "resolved" && this.state === "cancelled") { return false; }
+    this.#halt();
     this.#state = "resolved";
-    this.#cb(this);
+    // we need to check cb here, as one run execute right after the constructor call, without start
+    this.#cb?.(this);
     return true;
   }
 
@@ -137,7 +138,7 @@ export class Timeout {
    */
   pause(): boolean {
     if (this.#state !== "pending") { return false; }
-    this._halt();
+    this.#halt();
     this.#state = "paused";
     return true;
   }
@@ -148,7 +149,7 @@ export class Timeout {
    */
   resume(): boolean {
     if (this.#state !== "paused") { return false; }
-    this._run();
+    this.#run();
     return true;
   }
 
@@ -180,10 +181,10 @@ export class Timeout {
     }
     if (this.isStarted) {
       if (!this.isPending) { return false; }
-      this._halt();
+      this.#halt();
       this.#delay = delay;
       this.#timeLeft = delay;
-      this._run();
+      this.#run();
     } else {
       this.#delay = delay;
       this.#timeLeft = delay;
@@ -196,7 +197,7 @@ export class Timeout {
     return this.#delay;
   }
 
-  private _run() {
+  #run() {
     this.#startTime = new Date().getTime();
     this.#state = "pending";
     this.#to = setTimeout(()=>{
@@ -206,7 +207,7 @@ export class Timeout {
       this.#cb(this);
     }, this.#timeLeft);
   }
-  private _halt() {
+  #halt() {
     if (this.#to) {
       clearTimeout(this.#to);
       this.#to = null;

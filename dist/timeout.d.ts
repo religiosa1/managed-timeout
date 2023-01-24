@@ -1,8 +1,8 @@
-export declare const callbackError = "Expeting to get a cb function as the first argument";
-export declare const delayError = "Delay argument should be a number >= 0";
-export declare const repeatedStart = "Timeout was already started";
-export declare type TimeoutState = "ready" | "pending" | "paused" | "resolved" | "cancelled";
-export declare class Timeout {
+declare const callbackError = "Expeting to get a cb function as the first argument";
+declare const delayError = "Delay argument should be a number >= 0";
+declare const repeatedStart = "Timeout was already started";
+declare type TimeoutState = "ready" | "pending" | "paused" | "resolved" | "cancelled";
+declare class Timeout {
     #private;
     /** Timeout constructor, without scheduling a callback.
       * Callback must be provided later with the start function.
@@ -74,7 +74,6 @@ export declare class Timeout {
     reset(delay?: number): boolean;
     /** Current set total delay (from the constructor or consecutive calls to reset) */
     get delay(): number;
-    private _run;
-    private _halt;
 }
-export default Timeout;
+
+export { Timeout, TimeoutState, callbackError, Timeout as default, delayError, repeatedStart };

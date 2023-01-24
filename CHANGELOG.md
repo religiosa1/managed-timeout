@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.0] - 2022-01-13
+## [2.1.0] - 2022-01-24
+### Added
+- ESM module export added, UMD module changed to CJS.
+- minifaction for the bundles (bundle size decreased to 3.2kB)
+### Fix
+- Potential errors when execute was called before start() call (with no cb provided)
+- Incorrect execute() behavior on finished and cancelled state, introduced in 2.0.0
+### Changed
+- all private methods changed to be ECMAScript privates
+
+## [2.0.0] - 2022-01-23
 ### Added
 - state field
 ### Changed

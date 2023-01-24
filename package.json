@@ -1,15 +1,22 @@
 {
   "name": "managed-timeout",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "setTimeout class wrapper with abilities to pause/resume, finish preemptively, and inspection",
   "repository": {
     "type": "git",
     "url": "https://github.com/religiosa1/managed-timeout.git"
   },
-  "types": "dist/timeout.d.ts",
-  "main": "dist/timeout.js",
+  "main": "./dist/timeout.js",
+  "es2015": "./dist/timeout.mjs",
+  "types": "./dist/timeout.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/timeout.mjs",
+      "require": "./dist/timeout.js"
+    }
+  },
   "scripts": {
-    "build": "tsc -p .",
+    "build": "tsup --dts",
     "test": "jest --coverage",
     "lint": "eslint ."
   },
@@ -32,6 +39,7 @@
     "eslint-plugin-jest": "^25.2.4",
     "jest": "^27.3.1",
     "mockdate": "^3.0.5",
+    "tsup": "^6.5.0",
     "typescript": "^4.5.2"
   }
 }
