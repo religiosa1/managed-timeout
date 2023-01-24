@@ -3,12 +3,13 @@
     "moduleResolution": "node",
     "target": "ES2015",
     "module": "UMD",
-    "lib": [ "ES5", "ES2015.Promise", "DOM" ],
+    "lib": [ "ES2015", "ES2015.Promise", "DOM" ],
     "declaration": true,
     "noImplicitAny": true,
     "esModuleInterop": true,
     "sourceMap": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "strict": true
   },
   "include": [
     "./src/timeout.ts",

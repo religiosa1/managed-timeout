@@ -1,7 +1,7 @@
-declare const callbackError = "Expeting to get a cb function as the first argument";
-declare const delayError = "Delay argument should be a number >= 0";
-declare const repeatedStart = "Timeout was already started";
-declare type TimeoutState = "ready" | "pending" | "paused" | "resolved" | "cancelled";
+declare const callbackError: "Expeting to get a cb function as the first argument";
+declare const delayError: "Delay argument should be a number >= 0";
+declare const repeatedStart: "Timeout was already started";
+type TimeoutState = "ready" | "pending" | "paused" | "resolved" | "cancelled";
 declare class Timeout {
     #private;
     /** Timeout constructor, without scheduling a callback.

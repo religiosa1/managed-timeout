@@ -1,15 +1,13 @@
-const { Timeout } = require("../dist/timeout");
-const { Timer } = require("./Timer");
+import { Timeout } from "../src/timeout";
 const delay = 1000;
 
 describe("pause-resume functionality", ()=>{
   test("pause", () => {
-    let callback = jest.fn();
-    let timer = new Timer();
-    let to = new Timeout(callback, delay);
+    const callback = jest.fn();
+    const to = new Timeout(callback, delay);
     to.pause();
-    timer.advance(delay);
-    expect(callback).not.toBeCalled();
+    jest.advanceTimersByTime(delay);
+    expect(callback).not.toHaveBeenCalled();
     expect(to.paused).toBe(true);
     expect(to.isPending).toBe(true);
     expect(to.isFinished).toBe(false);
@@ -18,17 +16,16 @@ describe("pause-resume functionality", ()=>{
   });
 
   test("resume", () => {
-    let callback = jest.fn();
-    let timer = new Timer();
-    let to = new Timeout(callback, delay);
-    timer.advance(delay*0.25);
+    const callback = jest.fn();
+    const to = new Timeout(callback, delay);
+    jest.advanceTimersByTime(delay*0.25);
     to.pause();
-    timer.advance(delay);
-    expect(callback).not.toBeCalled();
+    jest.advanceTimersByTime(delay);
+    expect(callback).not.toHaveBeenCalled();
     to.resume();
     expect(to.paused).toBe(false);
-    timer.advance(delay);
-    expect(callback).toBeCalled();
+    jest.advanceTimersByTime(delay);
+    expect(callback).toHaveBeenCalled();
     expect(to.isPending).toBe(false);
     expect(to.isFinished).toBe(true);
     expect(to.isCanceled).toBe(false);
@@ -36,16 +33,15 @@ describe("pause-resume functionality", ()=>{
   });
 
   test("pause property set", () => {
-    let callback = jest.fn();
-    let timer = new Timer();
-    let to = new Timeout(callback, delay);
+    const callback = jest.fn();
+    const to = new Timeout(callback, delay);
     to.paused = true;
     expect(to.paused).toBe(true);
-    timer.advance(delay);
-    expect(callback).not.toBeCalled();
+    jest.advanceTimersByTime(delay);
+    expect(callback).not.toHaveBeenCalled();
     to.paused = false;
-    timer.advance(delay);
-    expect(callback).toBeCalled();
+    jest.advanceTimersByTime(delay);
+    expect(callback).toHaveBeenCalled();
     expect(to.paused).toBe(false);
     expect(to.isPending).toBe(false);
     expect(to.isFinished).toBe(true);

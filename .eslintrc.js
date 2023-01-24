@@ -1,24 +1,35 @@
 module.exports = {
-    "env": {
+    env: {
         "browser": true,
         "es6": true,
         "node": true,
         "jest/globals": true
     },
-    "extends": [
-        "plugin:@typescript-eslint/eslint-recommended",
+    parser: '@typescript-eslint/parser',
+    parserOptions: {
+        "ecmaVersion": 2015,
+    },
+    plugins: [
+        '@typescript-eslint',
+        "jest",
+    ],
+    extends: [
+        'eslint:recommended',
+        'plugin:@typescript-eslint/recommended',
         "plugin:jest/recommended"
     ],
-    "globals": {
+    root: true,
+    globals: {
         "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly"
+        "SharedArrayBuffer": "readonly",
     },
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaVersion": 2018
-    },
-    "plugins": [
-        "@typescript-eslint",
-        "jest",
+    overrides: [
+        {
+          "files": [ "tests/**/*.?s", "tests/**/*.?s" ],
+          "rules": {
+            "sno-empty-function":  "off",
+            "@typescript-eslint/no-empty-function":  "off",
+          }
+        }
     ]
 };
