@@ -74,11 +74,28 @@ export class Timeout {
     if (this.#state !== "pending") {
       return this.#timeLeft;
     }
-    return this.#delay - (new Date().getTime() - (this.#startTime ?? 0));
+    return this.#calculateTimeLeft();
   }
   /** Number of milliseconds of delay time passed. */
   get timePassed(): number {
     return this.#delay - this.timeLeft;
+  }
+
+  /** Timeout pause/resume status. */
+  get paused(): boolean {
+    return this.#state === "paused";
+  }
+  set paused(val: boolean) {
+    if (val) {
+      this.pause();
+    } else {
+      this.resume();
+    }
+  }
+
+  /** Current set total delay (from the constructor or consecutive calls to reset) */
+  get delay(): number {
+    return this.#delay;
   }
 
   /** Starts a timeout created without a callback.
@@ -87,17 +104,24 @@ export class Timeout {
   start(): Promise<Timeout>;
   /** Starts a timeout created without a callback.
    * @param cb callback to be called after the delay time has passed.
+   * @param cancelCb optional callback to be called if timeout is cancelled.
    * @returns true if callback was successfully started, false otherwise.
    */
-  start(cb: (to: Timeout)=>void): boolean;
-  start(cb?: (to: Timeout) => void): Promise<Timeout> | boolean {
+  start(
+    cb: (to: Timeout)=>void,
+    cancelCb?: (to: Timeout, reason: unknown) => void
+  ): boolean;
+  start(
+    cb?: (to: Timeout) => void,
+    cancelCb?: (to: Timeout, reason: unknown) => void
+  ): Promise<Timeout> | boolean {
     if (cb != null) {
       if (typeof cb !== "function") { throw new Error(ErrorMsg.callback); }
       if (this.isPending) {
         return false;
       }
       this.#cb = cb;
-      this.#reject = null;
+      this.#reject = (reason: unknown) => cancelCb?.(this, reason);
       this.#run();
       return true;
     } else {
@@ -115,11 +139,11 @@ export class Timeout {
   /** Cancels the timeout completely.
    * @returns true if the timeout was stopped, false if it wasn't pending to begin with
    */
-  cancel(): boolean {
-    if (this.#state !== "pending" && this.#state !== "paused") { return false; }
+  cancel(reason: unknown = new AbortError(ErrorMsg.abort)): boolean {
+    if (this.isFinished || this.isCanceled) { return false; }
     this.#halt();
     this.#state = "cancelled";
-    this.#reject?.(new AbortError(ErrorMsg.abort));
+    this.#reject?.(reason);
     return true;
   }
 
@@ -128,7 +152,7 @@ export class Timeout {
    * @returns {boolean} true if the timeout was finished, false if it was already finished or canceled before
    */
   execute(): boolean {
-    if (this.#state === "resolved" || this.state === "cancelled") { return false; }
+    if (this.isFinished || this.isCanceled) { return false; }
     this.#halt();
     this.#state = "resolved";
     // we need to check cb here, as one run execute right after the constructor call, without start
@@ -155,18 +179,6 @@ export class Timeout {
     if (this.#state !== "paused") { return false; }
     this.#run();
     return true;
-  }
-
-  /** Timeout pause/resume status. */
-  get paused(): boolean {
-    return this.#state === "paused";
-  }
-  set paused(val: boolean) {
-    if (val) {
-      this.pause();
-    } else {
-      this.resume();
-    }
   }
 
   /**
@@ -196,9 +208,8 @@ export class Timeout {
     return true;
   }
 
-  /** Current set total delay (from the constructor or consecutive calls to reset) */
-  get delay(): number {
-    return this.#delay;
+  #calculateTimeLeft() {
+    return this.#delay - (new Date().getTime() - (this.#startTime ?? 0));
   }
 
   #run() {
@@ -211,12 +222,13 @@ export class Timeout {
       this.#cb?.(this);
     }, this.#timeLeft);
   }
+
   #halt() {
     if (this.#to) {
       clearTimeout(this.#to);
       this.#to = null;
     }
-    this.#timeLeft = this.timeLeft;
+    this.#timeLeft = this.#calculateTimeLeft();
   }
 }
 export default Timeout;

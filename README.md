@@ -45,12 +45,13 @@ If no callback is supplied to the **start** method, it returns a promise.
 It's the only part which isn't pure ES5, make sure to polyfill promises
 if you need to support platforms without them (IE).
 
-Currently, cancellation of a timeout will __not__ result in promise error,
-won't be rejected or resolved at all.
+Cancellation of a timeout will result in promise rejection.
 
 Consequtive calls to the start method will result in a promise rejection.
 All the timeout methods should still be called on the timeout instance and not
-on the promise instance. Or in simple terms: after a call to the start() method
+on the promise instance.
+
+Or in simple terms: after a call to the start() method
 only then/catch/finally and other promise methods can be chained.
 
 ```js
@@ -87,19 +88,24 @@ Throws if delay isn't a number or is less than zero
 ### Methods
 
 **`start(): Promise<Timeout>`**
-
-**`start(cb: (to: Timeout)=>void): boolean`**
+**`start(cb: (to: Timeout)=>void, cancelCb?: (to: Timeout, reason: unknown) => void): boolean`**
 
 Arms a timeout created without a callback. If the method was called without
 a callback, then returns a promise, which will be resolved once the delay time
 is passed (timeout can be paused or resumed as usual).
+
+Optional callback to be called if the timeout was cancelled can be supplied.
+Both callbacks receive the Timeout instance as their argument.
+
 Consequentive calls with a callback will return false, without a callback will
 return a rejected promise (previously created promises continue to work as usual).
 
-**`cancel(): boolean`**
+**`cancel(reason?: unknown): boolean`**
 
 Cancels the timeout completely.
 Returns true if the timeout was stopped, false if it wasn't pending to begin with.
+Can recieve an optional reason, that will be passed to either cancelCb or
+which will be used as the promise rejection value (defaults to AbortError).
 
 **`execute(): boolean`**
 
