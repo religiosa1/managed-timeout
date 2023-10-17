@@ -12,7 +12,8 @@
   "exports": {
     ".": {
       "import": "./dist/timeout.mjs",
-      "require": "./dist/timeout.js"
+      "require": "./dist/timeout.js",
+      "types": "./dist/timeout.d.ts"
     }
   },
   "scripts": {
