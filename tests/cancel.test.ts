@@ -1,4 +1,4 @@
-import Timeout from "../src/timeout";
+import Timeout from "../src/Timeout";
 import makeAllToStates from "./makeAllToStates";
 
 describe("cancel", () => {

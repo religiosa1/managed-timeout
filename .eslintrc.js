@@ -23,6 +23,9 @@ module.exports = {
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly",
     },
+    rules: {
+        "@typescript-eslint/no-explicit-any": "off",
+    },
     overrides: [
         {
           "files": [ "tests/**/*.?s", "tests/**/*.?s" ],

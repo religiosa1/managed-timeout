@@ -42,8 +42,6 @@ to.start(()=>console.log("to fired"));
 ### Promise-style
 
 If no callback is supplied to the **start** method, it returns a promise.
-It's the only part which isn't pure ES5, make sure to polyfill promises
-if you need to support platforms without them (IE).
 
 Cancellation of a timeout will result in promise rejection.
 
@@ -88,7 +86,7 @@ Throws if delay isn't a number or is less than zero
 ### Methods
 
 **`start(): Promise<Timeout>`**
-**`start(cb: (to: Timeout)=>void, cancelCb?: (to: Timeout, reason: unknown) => void): boolean`**
+**`start(cb: (to: Timeout)=>void, cancelCb?: (to: Timeout, reason: any) => void): boolean`**
 
 Arms a timeout created without a callback. If the method was called without
 a callback, then returns a promise, which will be resolved once the delay time
@@ -100,7 +98,7 @@ Both callbacks receive the Timeout instance as their argument.
 Consequentive calls with a callback will return false, without a callback will
 return a rejected promise (previously created promises continue to work as usual).
 
-**`cancel(reason?: unknown): boolean`**
+**`cancel(reason?: any): boolean`**
 
 Cancels the timeout completely.
 Returns true if the timeout was stopped, false if it wasn't pending to begin with.

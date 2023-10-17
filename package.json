@@ -6,14 +6,14 @@
     "type": "git",
     "url": "https://github.com/religiosa1/managed-timeout.git"
   },
-  "main": "./dist/timeout.js",
-  "es2015": "./dist/timeout.mjs",
-  "types": "./dist/timeout.d.ts",
+  "main": "./dist/Timeout.js",
+  "es2015": "./dist/Timeout.mjs",
+  "types": "./dist/Timeout.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/timeout.mjs",
-      "require": "./dist/timeout.js",
-      "types": "./dist/timeout.d.ts"
+      "import": "./dist/Timeout.mjs",
+      "require": "./dist/Timeout.js",
+      "types": "./dist/Timeout.d.ts"
     }
   },
   "scripts": {

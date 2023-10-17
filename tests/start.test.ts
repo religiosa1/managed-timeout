@@ -1,4 +1,4 @@
-import { Timeout }  from "../src/timeout";
+import { Timeout }  from "../src/Timeout";
 const delay = 1000;
 
 describe("delayed start execution", ()=>{

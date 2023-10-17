@@ -109,11 +109,11 @@ export class Timeout {
    */
   start(
     cb: (to: Timeout)=>void,
-    cancelCb?: (to: Timeout, reason: unknown) => void
+    cancelCb?: (to: Timeout, reason: any) => void
   ): boolean;
   start(
     cb?: (to: Timeout) => void,
-    cancelCb?: (to: Timeout, reason: unknown) => void
+    cancelCb?: (to: Timeout, reason: any) => void
   ): Promise<Timeout> | boolean {
     if (cb != null) {
       if (typeof cb !== "function") { throw new Error(ErrorMsg.callback); }
@@ -139,7 +139,7 @@ export class Timeout {
   /** Cancels the timeout completely.
    * @returns true if the timeout was stopped, false if it wasn't pending to begin with
    */
-  cancel(reason: unknown = new AbortError(ErrorMsg.abort)): boolean {
+  cancel(reason: any = new AbortError(ErrorMsg.abort)): boolean {
     if (this.isFinished || this.isCanceled) { return false; }
     this.#halt();
     this.#state = "cancelled";

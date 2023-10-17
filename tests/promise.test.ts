@@ -1,4 +1,4 @@
-import { Timeout } from "../src/timeout";
+import { Timeout } from "../src/Timeout";
 import { repeatedStart, abort } from "../src/ErrorMessages";
 const delay = 1000;
 

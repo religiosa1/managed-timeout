@@ -1,4 +1,4 @@
-import Timeout, { TimeoutState } from "../src/timeout";
+import Timeout, { TimeoutState } from "../src/Timeout";
 
 const noop = () => {};
 export default function<T = Timeout>(mapper?: (to: Timeout) => T): Record<TimeoutState, T> {

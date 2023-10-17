@@ -1,4 +1,4 @@
-import { Timeout, TimeoutState } from "../src/timeout";
+import { Timeout, TimeoutState } from "../src/Timeout";
 import makeAllToStates from "./makeAllToStates";
 const delay = 1000;
 
