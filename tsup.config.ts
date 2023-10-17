@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  entry: ['src/timeout.ts'],
+  entry: ['src/Timeout.ts'],
   splitting: false,
   sourcemap: true,
   clean: true,

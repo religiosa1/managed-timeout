@@ -1,6 +1,5 @@
-export const callbackError = "Expeting to get a cb function as the first argument";
-export const delayError = "Delay argument should be a number >= 0";
-export const repeatedStart = "Timeout was already started";
+import { AbortError } from "./AbortError";
+import * as ErrorMsg from "./ErrorMessages";
 
 export type TimeoutState = "ready" | "pending" | "paused" | "resolved" | "cancelled";
 export class Timeout {
@@ -10,11 +9,13 @@ export class Timeout {
   /** Time left for a timeout for the resume call (after it was paused) */
   #timeLeft: number;
   /** setTimeout identifier */
-  #to: any;
+  #to: ReturnType<typeof setTimeout> | null = null;
   /** latest setTimeout call time as returned by Date.getTime() */
-  #startTime: number;
+  #startTime: number | undefined;
   /** timeout callback */
-  #cb: (to: Timeout)=>void;
+  #cb: ((to: Timeout)=>void) | null = null;
+  /** Promise cancellation callback */
+  #reject: ((reason: unknown) => void) | null = null;
 
  /** Timeout constructor, without scheduling a callback.
    * Callback must be provided later with the start function.
@@ -33,8 +34,8 @@ export class Timeout {
     delay?: number,
   ) {
     const d = (typeof cb_or_delay === "number") ? cb_or_delay : delay;
-    if (!Number.isInteger(d) || d < 0) {
-      throw new Error(delayError);
+    if (typeof d !== "number" || !Number.isInteger(d) || d < 0) {
+      throw new Error(ErrorMsg.delay);
     }
     this.#delay = d;
     this.#timeLeft = d;
@@ -73,11 +74,28 @@ export class Timeout {
     if (this.#state !== "pending") {
       return this.#timeLeft;
     }
-    return this.#delay - (new Date().getTime() - this.#startTime);
+    return this.#calculateTimeLeft();
   }
   /** Number of milliseconds of delay time passed. */
   get timePassed(): number {
     return this.#delay - this.timeLeft;
+  }
+
+  /** Timeout pause/resume status. */
+  get paused(): boolean {
+    return this.#state === "paused";
+  }
+  set paused(val: boolean) {
+    if (val) {
+      this.pause();
+    } else {
+      this.resume();
+    }
+  }
+
+  /** Current set total delay (from the constructor or consecutive calls to reset) */
+  get delay(): number {
+    return this.#delay;
   }
 
   /** Starts a timeout created without a callback.
@@ -86,24 +104,33 @@ export class Timeout {
   start(): Promise<Timeout>;
   /** Starts a timeout created without a callback.
    * @param cb callback to be called after the delay time has passed.
+   * @param cancelCb optional callback to be called if timeout is cancelled.
    * @returns true if callback was successfully started, false otherwise.
    */
-  start(cb: (to: Timeout)=>void): boolean;
-  start(cb?: (to: Timeout) => void): Promise<Timeout> | boolean {
+  start(
+    cb: (to: Timeout)=>void,
+    cancelCb?: (to: Timeout, reason: any) => void
+  ): boolean;
+  start(
+    cb?: (to: Timeout) => void,
+    cancelCb?: (to: Timeout, reason: any) => void
+  ): Promise<Timeout> | boolean {
     if (cb != null) {
-      if (typeof cb !== "function") { throw new Error(callbackError); }
+      if (typeof cb !== "function") { throw new Error(ErrorMsg.callback); }
       if (this.isPending) {
         return false;
       }
       this.#cb = cb;
+      this.#reject = (reason: unknown) => cancelCb?.(this, reason);
       this.#run();
       return true;
     } else {
       return new Promise((resolve, reject) => {
         if (this.isPending) {
-          return reject(new Error(repeatedStart));
+          return reject(new Error(ErrorMsg.repeatedStart));
         }
         this.#cb = () => resolve(this);
+        this.#reject = (reason: unknown) => reject(reason);
         this.#run();
       });
     }
@@ -112,10 +139,11 @@ export class Timeout {
   /** Cancels the timeout completely.
    * @returns true if the timeout was stopped, false if it wasn't pending to begin with
    */
-  cancel(): boolean {
-    if (this.#state !== "pending" && this.#state !== "paused") { return false; }
+  cancel(reason: any = new AbortError(ErrorMsg.abort)): boolean {
+    if (this.isFinished || this.isCanceled) { return false; }
     this.#halt();
     this.#state = "cancelled";
+    this.#reject?.(reason);
     return true;
   }
 
@@ -124,7 +152,7 @@ export class Timeout {
    * @returns {boolean} true if the timeout was finished, false if it was already finished or canceled before
    */
   execute(): boolean {
-    if (this.#state === "resolved" && this.state === "cancelled") { return false; }
+    if (this.isFinished || this.isCanceled) { return false; }
     this.#halt();
     this.#state = "resolved";
     // we need to check cb here, as one run execute right after the constructor call, without start
@@ -153,18 +181,6 @@ export class Timeout {
     return true;
   }
 
-  /** Timeout pause/resume status. */
-  get paused(): boolean {
-    return this.#state === "paused";
-  }
-  set paused(val: boolean) {
-    if (val) {
-      this.pause();
-    } else {
-      this.resume();
-    }
-  }
-
   /**
    * Reset the timeout's delay with the previous delay value or a new one.
    * The timeout will be unpaused and running if it's in the paused state.
@@ -177,7 +193,7 @@ export class Timeout {
   reset(delay?: number): boolean {
     if ( delay == null) { delay = this.#delay; }
     if (typeof delay !== "number" || delay < 0) {
-      throw new Error(delayError);
+      throw new Error(ErrorMsg.delay);
     }
     if (this.isStarted) {
       if (!this.isPending) { return false; }
@@ -192,9 +208,8 @@ export class Timeout {
     return true;
   }
 
-  /** Current set total delay (from the constructor or consecutive calls to reset) */
-  get delay(): number {
-    return this.#delay;
+  #calculateTimeLeft() {
+    return this.#delay - (new Date().getTime() - (this.#startTime ?? 0));
   }
 
   #run() {
@@ -204,15 +219,16 @@ export class Timeout {
       this.#to = null;
       this.#state = "resolved";
       this.#timeLeft = 0;
-      this.#cb(this);
+      this.#cb?.(this);
     }, this.#timeLeft);
   }
+
   #halt() {
     if (this.#to) {
       clearTimeout(this.#to);
       this.#to = null;
     }
-    this.#timeLeft = this.timeLeft;
+    this.#timeLeft = this.#calculateTimeLeft();
   }
 }
 export default Timeout;

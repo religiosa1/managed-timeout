@@ -1,17 +1,14 @@
-const { Timeout } = require("../dist/timeout");
-const { Timer } = require("./Timer");
+import { Timeout } from "../src/Timeout";
 const delay = 1000;
 
 describe("basic usage", ()=> {
   test("simple timeout execution", () => {
-    let to;
-    let callback = jest.fn();
-    let timer = new Timer();
-    to = new Timeout(callback, delay);
+    const callback = jest.fn();
+    const to = new Timeout(callback, delay);
     expect(to.isStarted).toBe(true);
-    expect(callback).not.toBeCalled();
-    timer.advance(delay);
-    expect(callback).toBeCalled();
+    expect(callback).not.toHaveBeenCalled();
+    jest.advanceTimersByTime(delay);
+    expect(callback).toHaveBeenCalled();
     expect(callback).toHaveBeenCalledTimes(1);
     expect(to.isPending).toBe(false);
     expect(to.isFinished).toBe(true);
@@ -21,22 +18,23 @@ describe("basic usage", ()=> {
 
   it("should throw on bad callback", ()=>{
     expect(() => {
+      // @ts-expect-error bad argument type error check
       new Timeout("bad", delay);
     }).toThrow();
   });
   it("should throw on bad delay", ()=>{
     expect(() => {
+      // @ts-expect-error bad argument type error check
       new Timeout(()=>{}, "bad");
     }).toThrow();
   });
 
   test("cancelation", () => {
-    let callback = jest.fn();
-    let timer = new Timer();
-    let to = new Timeout(callback, delay);
+    const callback = jest.fn();
+    const to = new Timeout(callback, delay);
     to.cancel();
-    timer.advance(delay);
-    expect(callback).not.toBeCalled();
+    jest.advanceTimersByTime(delay);
+    expect(callback).not.toHaveBeenCalled();
     expect(to.isPending).toBe(false);
     expect(to.isFinished).toBe(false);
     expect(to.isCanceled).toBe(true);
