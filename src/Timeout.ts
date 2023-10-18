@@ -209,7 +209,7 @@ export class Timeout {
   }
 
   #calculateTimeLeft() {
-    return this.#delay - (new Date().getTime() - (this.#startTime ?? 0));
+    return this.#timeLeft - (new Date().getTime() - (this.#startTime ?? 0));
   }
 
   #run() {
