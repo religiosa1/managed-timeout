@@ -1,6 +1,6 @@
 {
   "name": "managed-timeout",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "setTimeout class wrapper with abilities to pause/resume, finish preemptively, and inspection",
   "repository": {
     "type": "git",
