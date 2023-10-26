@@ -1,6 +1,6 @@
 {
   "name": "managed-timeout",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "setTimeout class wrapper with abilities to pause/resume, finish preemptively, and inspection",
   "repository": {
     "type": "git",
@@ -11,11 +11,20 @@
   "types": "./dist/Timeout.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/Timeout.mjs",
-      "require": "./dist/Timeout.js",
-      "types": "./dist/Timeout.d.ts"
+      "import": {
+        "types": "./dist/Timeout.d.mts",
+        "default": "./dist/Timeout.mjs"
+      },
+      "require": {
+        "types": "./dist/Timeout.d.ts",
+        "require": "./dist/Timeout.js"
+      }
     }
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsup --dts",
     "test": "jest --coverage",

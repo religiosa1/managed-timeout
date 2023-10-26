@@ -2,10 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [3.0.3] - 2023-10-26
+### Fix
+- different d.ts files now included depending on esm/cjs import
+### Changed
+- removed all redundant files besides the actual dist from the npm package
 
 ## [3.0.2] - 2023-10-19
 ### Fix
@@ -17,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fix
 - Broken npm bundle (previous version unpublished)
 
-## [3.0.0] - 2023-10-18
+## [3.0.0] - 2023-10-18 [YANKED]
 ### Added
 - callback to be called on cancellation can now be provided via start()
   second argument argument
